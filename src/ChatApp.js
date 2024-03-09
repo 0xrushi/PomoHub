@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import {
-  Container,
   List,
   ListItem,
   ListItemText,
@@ -26,12 +25,11 @@ const ChatApp = () => {
   const [userName, setUserName] = useState("");
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(true);
 
-  const [showPicker, setShowPicker] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef(null);
 
-  const togglePicker = () => setShowPicker(!showPicker);
-
-  const onEmojiClick = (event, emojiObject) => {
-    console.log(emojiObject);
+  const togglePicker = () => {
+    setIsOpen(!isOpen);
   };
 
   const socketRef = useRef();
@@ -69,25 +67,39 @@ const ChatApp = () => {
 
   const theme = createTheme({
     palette: {
-      mode: 'dark',
+      mode: "dark",
       primary: {
-        main: '#000',
+        main: "#000",
       },
       background: {
-        default: '#ff7200',
-        paper: '#ff7200',
+        default: "#ff7200",
+        paper: "#ff7200",
       },
       text: {
-        primary: '#000',
-        secondary: '#000',
+        primary: "#000",
+        secondary: "#000",
       },
     },
   });
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Dependency array includes messages so it runs every time messages change
+
   return (
     <ThemeProvider theme={theme}>
-      <Grid container>
-        <Grid item xs={6} sx={{"background": "#ff7200", "padding-left":"8px"}}>
+      <Grid container sx={{ backgroundColor: "#ff7200" }}>
+        <Grid
+          item
+          xs={6}
+          sx={{ backgroundColor: "#ff7200", paddingLeft: "8px" }}
+        >
           <Dialog
             open={isUsernameDialogOpen}
             onClose={() => {}}
@@ -114,17 +126,14 @@ const ChatApp = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={handleUsernameSubmit}
-                color="primary"
-              >
+              <Button onClick={handleUsernameSubmit} color="primary">
                 Enter Chat
               </Button>
             </DialogActions>
           </Dialog>
           <List
             sx={{
-              maxHeight: "80vh",
+              maxHeight: "95%",
               overflow: "auto",
               marginBottom: "50px",
               backgroundColor: theme.palette.background.paper,
@@ -133,15 +142,29 @@ const ChatApp = () => {
             {messages.map((msg, index) => (
               <ListItem
                 key={index}
-                sx={{ backgroundColor: index % 2 === 0 ? "#d56309" : "#ed6f05" , color: "white"}} // Alternate list item background
+                sx={{
+                  backgroundColor: index % 2 === 0 ? "#d56309" : "#ed6f05",
+                  color: "white",
+                }} // Alternate list item background
                 // className="bg-red-800"
               >
                 <ListItemText primary={`${msg.name}: ${msg.message}`} />
               </ListItem>
             ))}
+            <div ref={messagesEndRef} />
           </List>
-          <form onSubmit={sendMessage} >
-            <Grid container spacing={1} >
+          <form onSubmit={sendMessage}>
+            <Grid
+              container
+              style={{
+                position: "fixed",
+                bottom: 0,
+                left: 0,
+                width: "50%",
+                background: "#ff7200",
+                padding: "8px",
+              }}
+            >
               <Grid item xs>
                 <TextField
                   fullWidth
@@ -149,16 +172,21 @@ const ChatApp = () => {
                   placeholder="Type a message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  sx={{ input: { color: 'black', backgroundColor: 'white' } }} // Adjust text color
+                  sx={{ input: { color: "black", backgroundColor: "white" } }} // Adjust text color
                 />
               </Grid>
-              <Grid item>
+              <Grid item className="px-2">
                 <Button
                   type="button"
-                  onClick={togglePicker}
+                  ref={buttonRef}
                   variant="contained"
-                  color="secondary"
-                  sx={{ height: "100%", fontSize: "24px", background: "#1a1a1a" }}
+                  color="primary"
+                  sx={{
+                    height: "100%",
+                    fontSize: "24px",
+                    background: "#1a1a1a",
+                  }}
+                  onClick={togglePicker}
                 >
                   😀
                 </Button>
@@ -168,18 +196,24 @@ const ChatApp = () => {
                   type="submit"
                   variant="contained"
                   color="primary"
-                  sx={{ height: "100%" }}
+                  sx={{ height: "100%", background: "#1a1a1a" }}
                 >
                   Send
                 </Button>
               </Grid>
             </Grid>
           </form>
-          <EmojiPicker
-            onEmojiClick={(e) => setMessage(message + e.emoji)}
-            open={showPicker}
-            customEmojis={emojiList}
-          />
+          {isOpen && (
+            <div style={{ marginBottom: "600px" }}>
+              <EmojiPicker
+                onEmojiClick={(e) =>
+                  setMessage((previousMessage) => previousMessage + e.emoji)
+                }
+                open={isOpen}
+                customEmojis={emojiList}
+              />
+            </div>
+          )}
         </Grid>
         <Grid item xs={6}>
           <AppTimer />

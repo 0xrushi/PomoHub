@@ -1,22 +1,42 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
 
+const path = require('path');
+const express = require('express');
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const http = require('http').createServer(app);
+const cors = require('cors');
+const io = require('socket.io')(http, {
+  cors: {
+    origin: "http://localhost:3001", 
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
+
+app.use(cors());
+app.use(express.static(__dirname));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+const messages = [];
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('a user connected');
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.emit('chat history', messages);
+
+  socket.on('new message', (data) => {
+    messages.push(data);
+    io.emit('new message', data);
   });
 
-  socket.on('new message', (msg) => {
-    io.emit('new message', msg);
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
   });
 });
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+http.listen(3000, () => {
+  console.log('listening on *:3000');
+});

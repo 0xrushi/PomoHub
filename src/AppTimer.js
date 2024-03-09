@@ -1,19 +1,19 @@
-import { useState } from 'react';
-
-import Timer from './components/timer/Timer.js';
-import TimerButton from './components/timer/TimerButton';
-import TimerSelector from './components/timer/TimerSelector';
-import Tasks from './components/tasks/Tasks';
-import Footer from './components/Footer';
+import { useState } from "react";
+import { Box } from "@mui/material";
+import Timer from "./components/timer/Timer.js";
+import TimerButton from "./components/timer/TimerButton";
+import TimerSelector from "./components/timer/TimerSelector";
+import Tasks from "./components/tasks/Tasks";
+import Footer from "./components/Footer";
 
 function AppTimer() {
   const [countdown, setCountdown] = useState({
-    minutes: 25,
+    minutes: 30,
     seconds: 0,
   });
   const [isRunning, setIsRunning] = useState(false);
   // State to switch color of timer selector bg
-  const [currentTimer, setCurrentTimer] = useState('Pomodoro');
+  const [currentTimer, setCurrentTimer] = useState("Pomodoro");
 
   let interval;
 
@@ -34,17 +34,17 @@ function AppTimer() {
     };
 
     // Determine the appropriate reset time based on the current timer type
-    if (currentTimer === 'Pomodoro') {
+    if (currentTimer === "Pomodoro") {
       resetTime = {
-        minutes: 25,
+        minutes: 30,
         seconds: 0,
       };
-    } else if (currentTimer === 'Short break') {
+    } else if (currentTimer === "Short break") {
       resetTime = {
         minutes: 5,
         seconds: 0,
       };
-    } else if (currentTimer === 'Long break') {
+    } else if (currentTimer === "Long break") {
       resetTime = {
         minutes: 10,
         seconds: 0,
@@ -60,70 +60,76 @@ function AppTimer() {
   }
 
   return (
-    <main className='font-atkinson flex min-h-screen min-w-full flex-col items-center justify-center bg-[#FF7200] text-white-500'    >
-      <div className='mt-16 flex items-center justify-center rounded-md bg-gray-100'>
-        <TimerSelector
-          timerType={'Pomodoro'}
-          time={{
-            minutes: 25,
-            seconds: 0,
-          }}
-          setCountdown={setCountdown}
-          currentTimer={currentTimer}
-          setCurrentTimer={setCurrentTimer}
-        />
-        <TimerSelector
-          timerType={'Break'}
-          time={{
-            minutes: 5,
-            seconds: 0,
-          }}
-          setCountdown={setCountdown}
-          currentTimer={currentTimer}
-          setCurrentTimer={setCurrentTimer}
-        />
-
-      </div>
-
-      <Timer
-        countdown={countdown}
-        setCountdown={setCountdown}
-        isRunning={isRunning}
-        interval={interval}
-      />
-
-      <div className='flex items-center justify-center sm:mt-8 rounded-md bg-gray-100' style={{height:"20%"}}>
-        {isRunning ? (
-          <TimerButton
-            action={handlePause}
-            text={'pause'}
-            bgcolor={'white'}
-            textcolor={'text-gray-800'}
-            border={'rounded-l-md'}
-            label='Pause timer'
+    <Box style={{ position: "fixed" }}>
+      <main className="font-atkinson flex min-h-screen min-w-full flex-col items-center justify-center bg-[#FF7200] text-white-500">
+        <div className="mt-16 flex items-center justify-center rounded-md bg-gray-100">
+          <TimerSelector
+            timerType={"Pomodoro"}
+            time={{
+              minutes: 30,
+              seconds: 0,
+            }}
+            setCountdown={setCountdown}
+            currentTimer={currentTimer}
+            setCurrentTimer={setCurrentTimer}
           />
-        ) : (
-          <TimerButton
-            action={handleCountdown}
-            text={'play'}
-            bgcolor={'bg-gray-800'}
-            textcolor={'text-gray-100'}
-            // border={'rounded-l-md'}
-            label='Play timer'
+          <TimerSelector
+            timerType={"Break"}
+            time={{
+              minutes: 5,
+              seconds: 0,
+            }}
+            setCountdown={setCountdown}
+            currentTimer={currentTimer}
+            setCurrentTimer={setCurrentTimer}
           />
-        )}
+        </div>
 
-        <TimerButton
-          action={handleReset}
-          text={'reset'}
-          bgcolor={'white'}
-          // border={'rounded-r-md'}
-          label='Reset timer'
+        <Timer
+          countdown={countdown}
+          setCountdown={setCountdown}
+          isRunning={isRunning}
+          interval={interval}
         />
-      </div>
-      <Tasks />
-      <Footer />
-    </main>
+
+        <div
+          className="flex items-center justify-center sm:mt-8 rounded-md bg-gray-100"
+          style={{ height: "20%" }}
+        >
+          {isRunning ? (
+            <TimerButton
+              action={handlePause}
+              text={"pause"}
+              bgcolor={"white"}
+              textcolor={"text-gray-800"}
+              border={"rounded-l-md"}
+              label="Pause timer"
+            />
+          ) : (
+            <TimerButton
+              action={handleCountdown}
+              text={"play"}
+              bgcolor={"bg-gray-800"}
+              textcolor={"text-gray-100"}
+              // border={'rounded-l-md'}
+              label="Play timer"
+            />
+          )}
+
+          <TimerButton
+            action={handleReset}
+            text={"reset"}
+            bgcolor={"white"}
+            // border={'rounded-r-md'}
+            label="Reset timer"
+          />
+        </div>
+        <div className="overflow-y-auto" style={{ maxHeight: "500px" }}>
+          <Tasks />
+        </div>
+        <Footer />
+      </main>
+    </Box>
   );
 }
 
