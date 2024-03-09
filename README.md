@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+---
+# PomoHub
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Introduction
 
-## Available Scripts
+Welcome to PomoHub, the first open-source group-based Pomodoro timer inspired by the much-loved but now discontinued service from Fiveable. PomoHub is designed to help teams, study groups, and friends boost their productivity by enabling them to share and participate in Pomodoro sessions together, in real-time, from anywhere in the world.
 
-In the project directory, you can run:
+The Pomodoro Technique is a time management method that encourages people to work with the time they have—rather than against it. Using this method, you break your workday into 25-minute chunks separated by five-minute breaks. These intervals are referred to as pomodoros. After about four pomodoros, you take a longer break of about 15 to 20 minutes.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Real-Time Collaboration:** Join a room and participate in Pomodoro sessions with your team or friends in real-time.
+- **Cross-Platform Support:** Access PomoHub from any web-enabled device, no installation required.
+- **Open-Source:** PomoHub is fully open-source, welcoming contributions from developers interested in enhancing its features and reach.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+To start using PomoHub, follow these steps:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. **Clone the Repository:**
 
-### `npm run build`
+   ```
+   git clone https://github.com/YourUsername/PomoHub.git
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. **Install Dependencies:**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   Navigate to the project directory and install the required dependencies:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```
+   cd PomoHub
+   npm install
+   ```
 
-### `npm run eject`
+3. **Start the Application:**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+   Once the dependencies are installed, you can start the application by running:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```
+   node server.js
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   In second terminal, 
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   ```
+   npm start
+   ```
 
-## Learn More
+   Visit `http://localhost:3001` on your browser to start using PomoHub.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Contributing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Note on Server Costs and Database
 
-### Code Splitting
+To keep PomoHub accessible and minimize server costs, the current version of the application does not utilize a backend database. This design decision helps to reduce the overhead associated with data storage and management but means that certain features, like persistent history or accounts, are not available at this time.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Interested in Contributing a Database Solution?
 
-### Analyzing the Bundle Size
+We understand the importance of data persistence for enhancing user experience and functionality. If you're interested in contributing to PomoHub by integrating a database solution, we would love to see your pull requests!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Adding a database would open up new possibilities for features such as user accounts, session history, and more detailed productivity analytics. We encourage anyone with ideas or the technical ability to implement such features to contribute to the project.
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+We welcome contributions from the community! If you're interested in improving PomoHub, please take a look at our contributing guidelines. You can contribute in various ways such as submitting bug reports, suggesting enhancements, and adding code changes to improve functionality or fix issues.
