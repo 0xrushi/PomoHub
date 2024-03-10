@@ -220,7 +220,6 @@ const ChatApp = () => {
                       'https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/dog.png',
                     id: 'dog'
                   },]}
-                categories={['custom']}
               />
           )}
         </Grid>
