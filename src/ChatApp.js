@@ -33,7 +33,7 @@ const ChatApp = () => {
   const socketRef = useRef();
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000");
+    socketRef.current = io("http://0.0.0.0:3000");
 
     socketRef.current.on("chat history", (history) => {
       setMessages(history);
