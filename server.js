@@ -1,45 +1,103 @@
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
-const path = require('path');
-const express = require('express');
+let timerState = {
+  countdown: { minutes: 25, seconds: 0 },
+  isRunning: false,
+};
+
 const app = express();
-const http = require('http').createServer(app);
-const cors = require('cors');
-const io = require('socket.io')(http, {
+const server = http.createServer(app);
+
+const io = new Server(server, {
   cors: {
-    origin: "*", // The origin of your client app
+    origin: "http://localhost:3001",
     methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true
+  },
+});
+let chatHistory = [];
+
+// Function to decrement the timer
+function decrementTimer() {
+  if (timerState.countdown.seconds > 0) {
+    timerState.countdown.seconds -= 1;
+  } else if (timerState.countdown.minutes > 0) {
+    timerState.countdown.minutes -= 1;
+    timerState.countdown.seconds = 59;
+  } else {
+    timerState.isRunning = false;
   }
-});
+}
 
-// Use cors middleware
-app.use(cors());
-// Serve static files from the current directory
-app.use(express.static(__dirname));
+// Broadcast timer state every second
+setInterval(() => {
+  if (timerState.isRunning) {
+    decrementTimer();
+    io.emit("timer update", timerState);
+  }
+}, 1000);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+io.on("connection", (socket) => {
+  console.log("A user connected");
 
-const messages = [];
+  // Send the current timer state to newly connected clients
+  socket.emit("timer update", timerState);
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  // Send the chat history to the new user
-  socket.emit('chat history', messages);
-
-  socket.on('new message', (data) => {
-    messages.push(data);
-    io.emit('new message', data);
+  // No need to emit here since the setInterval will handle broadcasting
+  socket.on("start timer", (data) => {
+    if (!timerState.isRunning) {
+      timerState = { ...data, isRunning: true };
+      console.log("Timer started", data);
+    }
   });
 
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+  socket.on("stop timer", () => {
+    if (timerState.isRunning) {
+      timerState.isRunning = false;
+      console.log("Timer stopped");
+
+      // Broadcast stop immediately
+      io.emit("timer update", timerState);
+    }
+  });
+
+  // Update the timer state without starting or stopping
+  socket.on("sync timer", (data) => {
+    timerState = { ...data, isRunning: timerState.isRunning };
+    console.log("Timer synchronized", timerState);
+  });
+
+  socket.on("reset timer", () => {
+    timerState = {
+      countdown: { minutes: 0, seconds: 0 },
+      isRunning: false,
+    };
+
+    // Set the countdown to the desired reset state
+    timerState.countdown = { minutes: 30, seconds: 0 };
+    console.log("Timer reset to 30 minutes");
+
+    // Broadcast the updated, reset timer state
+    io.emit("timer update", timerState);
+  });
+
+  // Send existing chat history to the newly connected client
+  socket.emit("chat history", chatHistory);
+
+  socket.on("send message", (message) => {
+    // Add the new message to the chat history
+    chatHistory.push(message);
+
+    // Broadcast the new message to all clients
+    io.emit("new message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+server.listen(3000, () => {
+  console.log("Server listening on *:3000");
 });

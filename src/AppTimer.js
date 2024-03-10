@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import Timer from "./components/timer/Timer.js";
 import TimerButton from "./components/timer/TimerButton";
 import TimerSelector from "./components/timer/TimerSelector";
 import Tasks from "./components/tasks/Tasks";
 import Footer from "./components/Footer";
+import { io } from "socket.io-client";
 
 function AppTimer() {
   const [countdown, setCountdown] = useState({
@@ -14,49 +15,56 @@ function AppTimer() {
   const [isRunning, setIsRunning] = useState(false);
   // State to switch color of timer selector bg
   const [currentTimer, setCurrentTimer] = useState("Pomodoro");
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io("http://0.0.0.0:3000");
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+    });
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from server");
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Connection error:", error.message);
+    });
+
+    // Listen for updates from the server to sync timer
+    newSocket.on("sync timer", (timerState) => {
+      setCountdown(timerState.countdown);
+      setIsRunning(timerState.isRunning);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   let interval;
-
-  //   Play, pause and reset functions
-  function handleCountdown() {
-    setIsRunning(true);
-  }
-
-  // clearInterval() method cancels a timed, repeating action which was previously established by a call to setInterval()
-
-  function handleReset() {
-    clearInterval(interval);
-    setIsRunning(false);
-
-    let resetTime = {
-      minutes: 0,
-      seconds: 0,
-    };
-
-    // Determine the appropriate reset time based on the current timer type
-    if (currentTimer === "Pomodoro") {
-      resetTime = {
-        minutes: 30,
-        seconds: 0,
-      };
-    } else if (currentTimer === "Short break") {
-      resetTime = {
-        minutes: 5,
-        seconds: 0,
-      };
-    } else if (currentTimer === "Long break") {
-      resetTime = {
-        minutes: 10,
-        seconds: 0,
-      };
-    }
-
-    setCountdown(resetTime);
-  }
 
   function handlePause() {
     clearInterval(interval);
     setIsRunning(false);
+    socket.emit("stop timer");
+  }
+
+  // Handle manual changes to the timer (for when the timer is not running)
+  function handleCountdown() {
+    setIsRunning(true); // Update the local state to reflect that the timer is running
+    // Emit the 'start timer' event to the server with the current countdown state and isRunning set to true
+    socket.emit("start timer", { countdown, isRunning: true });
+  }
+
+  function handleReset() {
+    // Reset the timer to 30 minutes, but not running
+    const resetState = { minutes: 30, seconds: 0 };
+    setCountdown(resetState);
+    setIsRunning(false);
+    // Emit a 'reset timer' event to the server, including the new state
+    socket.emit("reset timer", { countdown: resetState, isRunning: false });
   }
 
   return (
@@ -90,6 +98,7 @@ function AppTimer() {
           setCountdown={setCountdown}
           isRunning={isRunning}
           interval={interval}
+          socket={socket}
         />
 
         <div

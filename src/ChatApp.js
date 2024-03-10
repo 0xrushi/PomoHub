@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import EmojiPicker from "emoji-picker-react";
 import AppTimer from "./AppTimer";
-import { emojiList } from "./config/emojilist";
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
@@ -26,7 +25,6 @@ const ChatApp = () => {
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(true);
 
   const [isOpen, setIsOpen] = useState(false);
-  const buttonRef = useRef(null);
 
   const togglePicker = () => {
     setIsOpen(!isOpen);
@@ -35,7 +33,7 @@ const ChatApp = () => {
   const socketRef = useRef();
 
   useEffect(() => {
-    socketRef.current = io("http://0.0.0.0:3000");
+    socketRef.current = io("http://localhost:3000");
 
     socketRef.current.on("chat history", (history) => {
       setMessages(history);
@@ -57,7 +55,7 @@ const ChatApp = () => {
   const sendMessage = (e) => {
     e.preventDefault();
     if (message.trim()) {
-      socketRef.current.emit("new message", {
+      socketRef.current.emit("send message", {
         name: userName,
         message: message.trim(),
       });
@@ -97,7 +95,7 @@ const ChatApp = () => {
       <Grid container sx={{ backgroundColor: "#ff7200" }}>
         <Grid
           item
-          xs={6}
+          xs={9}
           sx={{ backgroundColor: "#ff7200", paddingLeft: "8px" }}
         >
           <Dialog
@@ -136,6 +134,7 @@ const ChatApp = () => {
               maxHeight: "95%",
               overflow: "auto",
               marginBottom: "50px",
+              width: "80%",
               backgroundColor: theme.palette.background.paper,
             }}
           >
@@ -160,7 +159,7 @@ const ChatApp = () => {
                 position: "fixed",
                 bottom: 0,
                 left: 0,
-                width: "50%",
+                width: "60%",
                 background: "#ff7200",
                 padding: "8px",
               }}
@@ -178,7 +177,6 @@ const ChatApp = () => {
               <Grid item className="px-2">
                 <Button
                   type="button"
-                  ref={buttonRef}
                   variant="contained"
                   color="primary"
                   sx={{
@@ -204,18 +202,29 @@ const ChatApp = () => {
             </Grid>
           </form>
           {isOpen && (
-            <div style={{ marginBottom: "600px" }}>
               <EmojiPicker
                 onEmojiClick={(e) =>
                   setMessage((previousMessage) => previousMessage + e.emoji)
                 }
                 open={isOpen}
-                customEmojis={emojiList}
+                customEmojis={[
+                  {
+                    names: ['Alice', 'alice in wonderland'],
+                    imgUrl:
+                      'file://custom_emojis/kekpack/1128_KEK4K.png',
+                    id: 'alice'
+                  },
+                  {
+                    names: ['Dog'],
+                    imgUrl:
+                      'https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/dog.png',
+                    id: 'dog'
+                  },]}
+                categories={['custom']}
               />
-            </div>
           )}
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={3}>
           <AppTimer />
         </Grid>
       </Grid>

@@ -1,59 +1,51 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function Timer({
-  countdown,
-  isRunning,
-  interval,
-  setCountdown,
-}) {
+const Timer = ({ socket, setCountdown, countdown }) => {
   const [editable, setEditable] = useState(false);
 
   useEffect(() => {
-    if (isRunning) {
-      setEditable(false); // Lock editing while the timer is running
-      interval = setInterval(() => {
-        setCountdown((prevCountdown) => {
-          if (prevCountdown.seconds > 0) {
-            return {
-              ...prevCountdown,
-              seconds: prevCountdown.seconds - 1,
-            };
-          } else if (prevCountdown.minutes > 0) {
-            return {
-              minutes: prevCountdown.minutes - 1,
-              seconds: 59,
-            };
-          } else {
-            // Countdown is complete
-            clearInterval(interval);
-            return prevCountdown;
-          }
-        });
-      }, 1000);
-    } else {
-      clearInterval(interval);
-      setEditable(true); // Allow editing when the timer is not running
-    }
+    if (socket) {
+      // Define the function to handle incoming timer updates
+      const handleTimerUpdate = (timerState) => {
+        const { countdown, isRunning } = timerState;
 
-    return () => clearInterval(interval);
-  }, [isRunning]);
+        // Update the timer display based on the server state
+        setCountdown(countdown);
+
+        setEditable(!isRunning);
+      };
+
+      // Register the event listener for 'timer update' events
+      socket.on("timer update", handleTimerUpdate);
+
+      // Cleanup function to remove the event listener
+      return () => {
+        socket.off("timer update", handleTimerUpdate);
+      };
+    }
+  }, [socket, setCountdown]);
 
   useEffect(() => {
+    // Dynamically update the document title with the timer state
     document.title = `${countdown.minutes}:${countdown.seconds
       .toString()
       .padStart(2, "0")} | Focus`;
   }, [countdown]);
 
-  const handleChange = (
-    e,
-    type
-  ) => {
+  // Handle manual changes to the timer (for when the timer is not running)
+  const handleChange = (e, type) => {
+    if (!editable) return;
+
     const value = Math.max(0, parseInt(e.target.value, 10) || 0);
-    setCountdown((prev) => ({
-      ...prev,
-      [type]: value,
-    }));
+    const updatedCountdown = { ...countdown, [type]: value };
+    setCountdown(updatedCountdown);
+
+    // Emit a 'sync timer' event for manual adjustments, reflecting changes across all clients
+    socket.emit("sync timer", {
+      countdown: updatedCountdown,
+      isRunning: false,
+    });
   };
 
   const isUnderOneMinute = countdown.minutes === 0 && countdown.seconds < 60;
@@ -67,22 +59,22 @@ export default function Timer({
         <div className={timerClassName}>
           <input
             type="number"
-            style={{ background: "#ff7200", width: "40%" }}
             value={countdown.minutes.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "minutes")}
-            className="w-20 text-center"
+            className="timer-input"
+            style={{ background: "#ff7200", width: "200px" }}
           />
           :
           <input
             type="number"
-            style={{ background: "#ff7200", width: "40%" }}
             value={countdown.seconds.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "seconds")}
-            className="w-20 text-center"
+            className="timer-input"
+            style={{ background: "#ff7200", width: "200px" }}
           />
         </div>
       ) : (
-        <motion.time
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className={timerClassName}
@@ -90,8 +82,10 @@ export default function Timer({
           {`${countdown.minutes.toString().padStart(2, "0")}:${countdown.seconds
             .toString()
             .padStart(2, "0")}`}
-        </motion.time>
+        </motion.div>
       )}
     </>
   );
-}
+};
+
+export default Timer;
