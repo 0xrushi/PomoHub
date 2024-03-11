@@ -1,4 +1,4 @@
-import FullScreen from './FullScreen';
+import FullScreen from "./FullScreen";
 
 export default function Footer() {
   return (

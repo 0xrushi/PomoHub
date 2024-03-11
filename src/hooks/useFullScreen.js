@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function useFullScreen() {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -12,7 +12,7 @@ export default function useFullScreen() {
         })
         .catch((err) => {
           console.error(
-            `Error attempting to enable full-screen mode: ${err.message}`
+            `Error attempting to enable full-screen mode: ${err.message}`,
           );
         });
     } else {
@@ -24,7 +24,7 @@ export default function useFullScreen() {
           })
           .catch((err) => {
             console.error(
-              `Error attempting to exit full-screen mode: ${err.message}`
+              `Error attempting to exit full-screen mode: ${err.message}`,
             );
           });
       }

@@ -1,0 +1,9 @@
+tunnel: 123456
+credentials-file: /home/ubuntu/.cloudflared/123456.json
+
+ingress:
+  - hostname: pomotimer.com
+    service: http://localhost:8080
+  - hostname: api.pomotimer.com
+    service: http://localhost:3000
+  - service: http_status:404

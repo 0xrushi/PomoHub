@@ -33,7 +33,7 @@ const ChatApp = () => {
   const socketRef = useRef();
 
   useEffect(() => {
-    socketRef.current = io("http://0.0.0.0:3000");
+    socketRef.current = io(process.env.REACT_APP_API_URL);
 
     socketRef.current.on("chat history", (history) => {
       setMessages(history);
@@ -100,7 +100,7 @@ const ChatApp = () => {
         >
           <Dialog
             open={isUsernameDialogOpen}
-            onClose={() => {}}
+            onClose={{}}
             aria-labelledby="form-dialog-title"
           >
             <DialogTitle id="form-dialog-title">Enter Username</DialogTitle>
@@ -202,25 +202,13 @@ const ChatApp = () => {
             </Grid>
           </form>
           {isOpen && (
-              <EmojiPicker
-                onEmojiClick={(e) =>
-                  setMessage((previousMessage) => previousMessage + e.emoji)
-                }
-                open={isOpen}
-                customEmojis={[
-                  {
-                    names: ['Alice', 'alice in wonderland'],
-                    imgUrl:
-                      'file://custom_emojis/kekpack/1128_KEK4K.png',
-                    id: 'alice'
-                  },
-                  {
-                    names: ['Dog'],
-                    imgUrl:
-                      'https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/dog.png',
-                    id: 'dog'
-                  },]}
-              />
+            <EmojiPicker
+              onEmojiClick={(e) =>
+                setMessage((previousMessage) => previousMessage + e.emoji)
+              }
+              open={isOpen}
+              customEmojis={[]}
+            />
           )}
         </Grid>
         <Grid item xs={3}>

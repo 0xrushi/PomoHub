@@ -1,6 +1,9 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const fs = require("fs");
+const cors = require('cors');
+require('dotenv').config();
 
 let timerState = {
   countdown: { minutes: 25, seconds: 0 },
@@ -8,11 +11,12 @@ let timerState = {
 };
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://0.0.0.0:3001",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -98,6 +102,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("Server listening on *:3000");
+const port = process.env.SERVER_PORT
+server.listen(port, "0.0.0.0", () => {
+  console.log("Server listening on *:" + port);
 });
