@@ -54,7 +54,11 @@ io.on("connection", (socket) => {
     // Broadcast updated user list to all clients
     io.emit(
       "update user list",
-      members.map((user) => ({ socketId: socket.id, name: user.name, isCurrentUser: true }))
+      members.map((user) => ({
+        socketId: socket.id,
+        name: user.name,
+        isCurrentUser: true,
+      }))
     );
   });
 
@@ -116,14 +120,19 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("User disconnected");
 
-    // Remove user from the list
-    users = members.filter((user) => user.socketId !== socket.id);
+    // Find the user with the corresponding socket ID
+    const userIndex = members.findIndex((user) => user.socketId === socket.id);
+    if (userIndex !== -1) {
+      const [user] = members.splice(userIndex, 1); // Remove the user from the array
 
-    // Broadcast updated user list to all clients
-    io.emit(
-      "update user list",
-      users.map((user) => ({ socketId: socket.id, name: user.name, isCurrentUser: true }))
-    );
+      console.log(`${user.name} has disconnected`);
+
+      // Broadcast the updated user list to all clients
+      io.emit(
+        "update user list",
+        members.map((user) => ({ name: user.name }))
+      );
+    }
   });
 });
 

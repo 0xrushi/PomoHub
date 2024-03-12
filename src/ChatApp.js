@@ -359,6 +359,7 @@ const ChatApp = () => {
             <AppTimer
               backgroundColor={backgroundColor}
               toggleGridState={toggleGridState}
+              newSocket={socketRef.current}
             />
           </Box>
         </Grid>

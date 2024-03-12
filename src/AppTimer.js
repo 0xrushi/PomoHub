@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import Timer from "./components/timer/Timer.js";
 import TimerButton from "./components/timer/TimerButton";
@@ -7,7 +7,7 @@ import Tasks from "./components/tasks/Tasks";
 import Footer from "./components/Footer";
 import { io } from "socket.io-client";
 
-function AppTimer({ backgroundColor, toggleGridState }) {
+function AppTimer({ backgroundColor, toggleGridState, newSocket }) {
   const [countdown, setCountdown] = useState({
     minutes: 30,
     seconds: 0,
@@ -15,11 +15,11 @@ function AppTimer({ backgroundColor, toggleGridState }) {
   const [isRunning, setIsRunning] = useState(false);
   // State to switch color of timer selector bg
   const [currentTimer, setCurrentTimer] = useState("Pomodoro");
-  const [socket, setSocket] = useState(null);
+  // const [socket, setSocket] = useState(null);
 
-  useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_API_URL);
-    setSocket(newSocket);
+  useRef(() => {
+    // const newSocket = io(process.env.REACT_APP_API_URL);
+    // setSocket(newSocket);
 
     newSocket.on("connect", () => {
       console.log("Connected to server");
@@ -48,14 +48,14 @@ function AppTimer({ backgroundColor, toggleGridState }) {
   function handlePause() {
     clearInterval(interval);
     setIsRunning(false);
-    socket.emit("stop timer");
+    newSocket.emit("stop timer");
   }
 
   // Handle manual changes to the timer (for when the timer is not running)
   function handleCountdown() {
     setIsRunning(true); // Update the local state to reflect that the timer is running
     // Emit the 'start timer' event to the server with the current countdown state and isRunning set to true
-    socket.emit("start timer", { countdown, isRunning: true });
+    newSocket.emit("start timer", { countdown, isRunning: true });
   }
 
   function handleReset() {
@@ -64,7 +64,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
     setCountdown(resetState);
     setIsRunning(false);
     // Emit a 'reset timer' event to the server, including the new state
-    socket.emit("reset timer", { countdown: resetState, isRunning: false });
+    newSocket.emit("reset timer", { countdown: resetState, isRunning: false });
   }
 
   useEffect(() => {
@@ -102,7 +102,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
           setCountdown={setCountdown}
           isRunning={isRunning}
           interval={interval}
-          socket={socket}
+          socket={newSocket}
           backgroundColor={backgroundColor}
         />
 
