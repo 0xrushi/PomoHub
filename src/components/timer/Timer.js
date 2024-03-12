@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-const Timer = ({ socket, setCountdown, countdown }) => {
+const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
   const [editable, setEditable] = useState(false);
 
   useEffect(() => {
@@ -33,6 +33,10 @@ const Timer = ({ socket, setCountdown, countdown }) => {
       .padStart(2, "0")} | Focus`;
   }, [countdown]);
 
+  useEffect(() => {
+    document.body.style.backgroundColor = backgroundColor;
+  }, []);
+
   // Handle manual changes to the timer (for when the timer is not running)
   const handleChange = (e, type) => {
     if (!editable) return;
@@ -62,7 +66,7 @@ const Timer = ({ socket, setCountdown, countdown }) => {
             value={countdown.minutes.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "minutes")}
             className="timer-input"
-            style={{ background: "#ff7200", width: "200px" }}
+            style={{ background: backgroundColor, width: "200px" }}
           />
           :
           <input
@@ -70,7 +74,7 @@ const Timer = ({ socket, setCountdown, countdown }) => {
             value={countdown.seconds.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "seconds")}
             className="timer-input"
-            style={{ background: "#ff7200", width: "200px" }}
+            style={{ background: backgroundColor, width: "200px" }}
           />
         </div>
       ) : (

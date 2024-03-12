@@ -45,6 +45,9 @@ setInterval(() => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  // Emitting to all clients that a user has connected
+  // io.emit("user event", { message: "A user has connected" });
+
   // Send the current timer state to newly connected clients
   socket.emit("timer update", timerState);
 

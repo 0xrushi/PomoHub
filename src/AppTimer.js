@@ -7,7 +7,7 @@ import Tasks from "./components/tasks/Tasks";
 import Footer from "./components/Footer";
 import { io } from "socket.io-client";
 
-function AppTimer() {
+function AppTimer({ backgroundColor, toggleGridState }) {
   const [countdown, setCountdown] = useState({
     minutes: 30,
     seconds: 0,
@@ -18,7 +18,7 @@ function AppTimer() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("http://0.0.0.0:3000");
+    const newSocket = io(process.env.REACT_APP_API_URL);
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -67,9 +67,13 @@ function AppTimer() {
     socket.emit("reset timer", { countdown: resetState, isRunning: false });
   }
 
+  useEffect(() => {
+    document.body.style.backgroundColor = backgroundColor;
+  }, [backgroundColor]);
+
   return (
     <Box style={{ position: "fixed" }}>
-      <main className="font-atkinson flex min-h-screen min-w-full flex-col items-center justify-center bg-[#FF7200] text-white-500">
+      <main className="font-atkinson flex min-h-screen min-w-full flex-col items-center justify-center text-white-500">
         <div className="mt-16 flex items-center justify-center rounded-md bg-gray-100">
           <TimerSelector
             timerType={"Pomodoro"}
@@ -99,6 +103,7 @@ function AppTimer() {
           isRunning={isRunning}
           interval={interval}
           socket={socket}
+          backgroundColor={backgroundColor}
         />
 
         <div
@@ -133,9 +138,11 @@ function AppTimer() {
             label="Reset timer"
           />
         </div>
-        <div className="overflow-y-auto" style={{ maxHeight: "500px" }}>
-          <Tasks />
-        </div>
+        {toggleGridState && (
+          <div className="overflow-y-auto" style={{ maxHeight: "500px" }}>
+            <Tasks />
+          </div>
+        )}
         <Footer />
       </main>
     </Box>

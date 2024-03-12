@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Popover } from "@mui/material";
+
+import IconButton from "@mui/material/IconButton";
+import SettingsApplicationsRoundedIcon from "@mui/icons-material/SettingsApplicationsRounded";
 import { io } from "socket.io-client";
 import {
   List,
@@ -16,13 +20,24 @@ import {
   createTheme,
 } from "@mui/material";
 import EmojiPicker from "emoji-picker-react";
+import { SketchPicker } from "react-color";
 import AppTimer from "./AppTimer";
+
+import Box from "@mui/material/Box";
+import { FormControl, FormLabel } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import MembersDisplay from "./components/memberdisplay/MemberDisplay";
+import SettingsComponent from "./components/settingscomponent/SettingsComponent";
+import tinycolor from "tinycolor2";
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [userName, setUserName] = useState("");
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(true);
+  const [toggleGridState, setToggleGridState] = useState(true);
+
+  const matches = useMediaQuery("(min-width:900px)");
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,7 +47,11 @@ const ChatApp = () => {
 
   const socketRef = useRef();
 
+  const [members, setMembers] = useState([]);
+
   useEffect(() => {
+    document.body.style.backgroundColor = backgroundColor;
+
     socketRef.current = io(process.env.REACT_APP_API_URL);
 
     socketRef.current.on("chat history", (history) => {
@@ -50,6 +69,7 @@ const ChatApp = () => {
 
   const handleUsernameSubmit = () => {
     setIsUsernameDialogOpen(false);
+    setMembers([...members, { name: userName, isCurrentUser: true }]);
   };
 
   const sendMessage = (e) => {
@@ -63,6 +83,36 @@ const ChatApp = () => {
     }
   };
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [backgroundColor, setBackgroundColor] = useState("#ff7200");
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
+  const changeBackgroundColor = (color) => {
+    setBackgroundColor(color);
+    handleClose(); // Close the popover after changing the color
+  };
+
+  const handleToggleGrid = () => {
+    setToggleGridState(!toggleGridState);
+  };
+
+  // Example function for handling background image change
+  const changeBackgroundImage = () => {
+    // Placeholder for actual implementation
+    console.log("Change background image clicked");
+    handleClose(); // Close the popover after selecting the image
+  };
+
   const theme = createTheme({
     palette: {
       mode: "dark",
@@ -70,8 +120,8 @@ const ChatApp = () => {
         main: "#000",
       },
       background: {
-        default: "#ff7200",
-        paper: "#ff7200",
+        default: backgroundColor, //"#ff7200",
+        paper: backgroundColor, //"#ff7200",
       },
       text: {
         primary: "#000",
@@ -88,131 +138,208 @@ const ChatApp = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]); // Dependency array includes messages so it runs every time messages change
+  }, [messages]);
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container sx={{ backgroundColor: "#ff7200" }}>
+      <Grid container sx={{ backgroundColor: backgroundColor }}>
+        {toggleGridState && (
+          <Grid
+            item
+            xs={matches ? 8 : 0}
+            sx={{ backgroundColor: backgroundColor, paddingLeft: "8px" }}
+          >
+            matches && (
+            <>
+              <Dialog
+                open={isUsernameDialogOpen}
+                onClose={{}}
+                aria-labelledby="form-dialog-title"
+              >
+                <DialogTitle id="form-dialog-title">Enter Username</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    To participate in the chat, please enter your username.
+                  </DialogContentText>
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Username"
+                    type="text"
+                    fullWidth
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && userName.trim())
+                        handleUsernameSubmit();
+                    }}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleUsernameSubmit} color="primary">
+                    Enter Chat
+                  </Button>
+                </DialogActions>
+              </Dialog>
+              <List
+                sx={{
+                  // maxHeight: "98%",
+                  height: "calc(98vh - 120px)",
+                  overflow: "auto",
+                  marginBottom: "50px",
+                  backgroundColor: theme.palette.background.paper,
+                }}
+              >
+                {messages.map((msg, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      backgroundColor:
+                        index % 2 === 0
+                          ? tinycolor(backgroundColor).darken(5).toString()
+                          : tinycolor(backgroundColor).darken(10).toString(),
+                      color: "white",
+                    }}
+                  >
+                    <ListItemText primary={`${msg.name}: ${msg.message}`} />
+                  </ListItem>
+                ))}
+                <div ref={messagesEndRef} />
+              </List>
+
+              {/* MembersDisplay */}
+
+              {/* The chat input form */}
+              <Grid
+                container
+                sx={{
+                  position: "sticky",
+                  bottom: 0,
+                  background: backgroundColor,
+                  padding: "8px",
+                  boxSizing: "border-box",
+                }}
+              >
+                {/* Using FormControl for the form area */}
+                <FormControl
+                  fullWidth
+                  style={{ display: "flex", flexDirection: "row" }}
+                >
+                  {/* Text field */}
+                  <TextField
+                    variant="outlined"
+                    placeholder="Type a message..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    sx={{
+                      input: { color: "black", backgroundColor: "white" },
+                      flexGrow: 1,
+                      mr: 1,
+                    }}
+                  />
+                  {/* Emoji button */}
+                  <Button
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      maxHeight: "56px", // Match the TextField height
+                      mr: 1, // Add margin right
+                    }}
+                    onClick={togglePicker}
+                  >
+                    😀
+                  </Button>
+                  {/* Send button */}
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      maxHeight: "56px", // Match the TextField height
+                    }}
+                    onClick={sendMessage} // Call the sendMessage function when clicked
+                  >
+                    Send
+                  </Button>
+                </FormControl>
+              </Grid>
+
+              {/* EmojiPicker */}
+              <Grid
+                container
+                style={{
+                  position: "fixed",
+                  bottom: 0,
+                  left: 0,
+                  background: backgroundColor,
+                  padding: "8px",
+                  width: "100%",
+                }}
+              >
+                <div style={{ position: "relative", width: "100%" }}>
+                  {isOpen && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: "60px",
+                        left: 0,
+                        right: 0,
+                        zIndex: 1000,
+                      }}
+                    >
+                      <EmojiPicker
+                        // prettier-ignore
+                        onEmojiClick={(event, emojiObject) =>
+                      setMessage(
+                        (previousMessage) => previousMessage + emojiObject.emoji
+                      )
+                    }
+                        pickerStyle={{ width: "auto" }}
+                      />
+                    </Box>
+                  )}
+                </div>
+              </Grid>
+            </>
+            )
+          </Grid>
+        )}
+        {/* Right side column for timer or other components */}
         <Grid
           item
-          xs={9}
-          sx={{ backgroundColor: "#ff7200", paddingLeft: "8px" }}
+          xs={matches && toggleGridState ? 4 : 12}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
         >
-          <Dialog
-            open={isUsernameDialogOpen}
-            onClose={{}}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle id="form-dialog-title">Enter Username</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                To participate in the chat, please enter your username.
-              </DialogContentText>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Username"
-                type="text"
-                fullWidth
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && userName.trim())
-                    handleUsernameSubmit();
-                }}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleUsernameSubmit} color="primary">
-                Enter Chat
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <List
+          <SettingsComponent
+            changeBackgroundColor={changeBackgroundColor}
+            changeBackgroundImage={changeBackgroundImage}
+            handleToggleGrid={handleToggleGrid}
+          />
+          <Box sx={{ position: "sticky", top: 0, width: "100%", zIndex: 1 }}>
+            <MembersDisplay
+              backgroundColor={backgroundColor}
+              members={members}
+            />
+          </Box>
+          <Box
             sx={{
-              maxHeight: "95%",
-              overflow: "auto",
-              marginBottom: "50px",
-              width: "80%",
-              backgroundColor: theme.palette.background.paper,
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              paddingTop: "10px",
             }}
           >
-            {messages.map((msg, index) => (
-              <ListItem
-                key={index}
-                sx={{
-                  backgroundColor: index % 2 === 0 ? "#d56309" : "#ed6f05",
-                  color: "white",
-                }} // Alternate list item background
-                // className="bg-red-800"
-              >
-                <ListItemText primary={`${msg.name}: ${msg.message}`} />
-              </ListItem>
-            ))}
-            <div ref={messagesEndRef} />
-          </List>
-          <form onSubmit={sendMessage}>
-            <Grid
-              container
-              style={{
-                position: "fixed",
-                bottom: 0,
-                left: 0,
-                width: "60%",
-                background: "#ff7200",
-                padding: "8px",
-              }}
-            >
-              <Grid item xs>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Type a message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  sx={{ input: { color: "black", backgroundColor: "white" } }} // Adjust text color
-                />
-              </Grid>
-              <Grid item className="px-2">
-                <Button
-                  type="button"
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    height: "100%",
-                    fontSize: "24px",
-                    background: "#1a1a1a",
-                  }}
-                  onClick={togglePicker}
-                >
-                  😀
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  sx={{ height: "100%", background: "#1a1a1a" }}
-                >
-                  Send
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-          {isOpen && (
-            <EmojiPicker
-              onEmojiClick={(e) =>
-                setMessage((previousMessage) => previousMessage + e.emoji)
-              }
-              open={isOpen}
-              customEmojis={[]}
+            <AppTimer
+              backgroundColor={backgroundColor}
+              toggleGridState={toggleGridState}
             />
-          )}
-        </Grid>
-        <Grid item xs={3}>
-          <AppTimer />
+          </Box>
         </Grid>
       </Grid>
     </ThemeProvider>
