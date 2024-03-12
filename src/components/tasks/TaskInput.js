@@ -1,8 +1,13 @@
-export default function TaskInput({ handleAddTask }) {
+import getFontColorForBackground from "../../utils";
+
+export default function TaskInput({ handleAddTask, backgroundColor }) {
   return (
     <form onSubmit={handleAddTask} className="mb-2 flex w-full items-center">
       <fieldset className="w-full rounded-lg border-4 border-gray-100">
-        <legend className="px-2 text-center text-2xl font-black uppercase">
+        <legend
+          className="px-2 text-center text-2xl font-black uppercase"
+          style={{ color: getFontColorForBackground(backgroundColor) }}
+        >
           Tasks
         </legend>
         <div className="flex w-full items-center justify-center p-2">

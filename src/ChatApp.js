@@ -29,6 +29,7 @@ import { useMediaQuery } from "@mui/material";
 import MembersDisplay from "./components/memberdisplay/MemberDisplay";
 import SettingsComponent from "./components/settingscomponent/SettingsComponent";
 import tinycolor from "tinycolor2";
+import getFontColorForBackground from "./utils";
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
@@ -245,7 +246,11 @@ const ChatApp = () => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       sx={{
-                        input: { color: "black", backgroundColor: "white" },
+                        input: {
+                          color: backgroundColor,
+                          backgroundColor:
+                            getFontColorForBackground(backgroundColor),
+                        },
                         flexGrow: 1,
                         mr: 1,
                       }}
@@ -254,10 +259,12 @@ const ChatApp = () => {
                     <Button
                       type="button"
                       variant="contained"
-                      color="primary"
                       sx={{
                         maxHeight: "56px", // Match the TextField height
                         mr: 1, // Add margin right
+                        color: backgroundColor,
+                        backgroundColor:
+                          getFontColorForBackground(backgroundColor),
                       }}
                       onClick={togglePicker}
                     >
@@ -267,9 +274,11 @@ const ChatApp = () => {
                     <Button
                       type="submit"
                       variant="contained"
-                      color="primary"
                       sx={{
                         maxHeight: "56px", // Match the TextField height
+                        color: backgroundColor,
+                        backgroundColor:
+                          getFontColorForBackground(backgroundColor),
                       }}
                       onClick={sendMessage} // Call the sendMessage function when clicked
                     >

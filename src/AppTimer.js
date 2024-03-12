@@ -140,7 +140,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
         </div>
         {toggleGridState && (
           <div className="overflow-y-auto" style={{ maxHeight: "200px" }}>
-            <Tasks />
+            <Tasks backgroundColor={backgroundColor} />
           </div>
         )}
         <Footer />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import getFontColorForBackground from "../../utils";
 
 const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
   const [editable, setEditable] = useState(false);
@@ -58,7 +59,7 @@ const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
   }`;
 
   return (
-    <>
+    <div style={{ color: getFontColorForBackground(backgroundColor) }}>
       {editable ? (
         <div className={timerClassName}>
           <input
@@ -66,7 +67,11 @@ const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
             value={countdown.minutes.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "minutes")}
             className="timer-input"
-            style={{ background: backgroundColor, width: "200px" }}
+            style={{
+              background: backgroundColor,
+              width: "200px",
+              color: getFontColorForBackground(backgroundColor),
+            }}
           />
           :
           <input
@@ -74,7 +79,11 @@ const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
             value={countdown.seconds.toString().padStart(2, "0")}
             onChange={(e) => handleChange(e, "seconds")}
             className="timer-input"
-            style={{ background: backgroundColor, width: "200px" }}
+            style={{
+              background: backgroundColor,
+              width: "200px",
+              color: getFontColorForBackground(backgroundColor),
+            }}
           />
         </div>
       ) : (
@@ -88,7 +97,7 @@ const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
             .padStart(2, "0")}`}
         </motion.div>
       )}
-    </>
+    </div>
   );
 };
 

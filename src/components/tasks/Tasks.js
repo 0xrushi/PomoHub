@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import TaskInput from "./TaskInput";
 import TaskList from "./TaskList";
 
-export default function Tasks() {
+export default function Tasks({ backgroundColor }) {
   const [tasks, setTasks] = useState([]);
 
   function handleAddTask(e) {
@@ -38,7 +38,10 @@ export default function Tasks() {
 
   return (
     <section className="flex w-96 flex-col items-center justify-center px-3">
-      <TaskInput handleAddTask={handleAddTask} />
+      <TaskInput
+        handleAddTask={handleAddTask}
+        backgroundColor={backgroundColor}
+      />
       <TaskList
         toggleUnderline={toggleUnderline}
         tasks={tasks}
