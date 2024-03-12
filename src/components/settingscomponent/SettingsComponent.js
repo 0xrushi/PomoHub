@@ -79,7 +79,7 @@ const SettingsComponent = ({
             handleClose();
           }}
         >
-          Cuckoo Mode
+          Toggle Cuckoo Mode
         </Button>
       </Popover>
     </>

@@ -74,7 +74,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
   return (
     <Box style={{ position: "fixed" }}>
       <main className="font-atkinson flex min-h-screen min-w-full flex-col items-center justify-center text-white-500">
-        <div className="mt-16 flex items-center justify-center rounded-md bg-gray-100">
+        <div className="flex items-center justify-center rounded-md bg-gray-100">
           <TimerSelector
             timerType={"Pomodoro"}
             time={{
@@ -107,7 +107,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
         />
 
         <div
-          className="flex items-center justify-center sm:mt-8 rounded-md bg-gray-100"
+          className="flex items-center justify-center sm:mt-4 rounded-md bg-gray-100"
           style={{ height: "20%" }}
         >
           {isRunning ? (
@@ -139,7 +139,7 @@ function AppTimer({ backgroundColor, toggleGridState }) {
           />
         </div>
         {toggleGridState && (
-          <div className="overflow-y-auto" style={{ maxHeight: "500px" }}>
+          <div className="overflow-y-auto" style={{ maxHeight: "200px" }}>
             <Tasks />
           </div>
         )}
