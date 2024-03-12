@@ -2,13 +2,14 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
-const cors = require('cors');
-require('dotenv').config();
+const cors = require("cors");
+require("dotenv").config();
 
 let timerState = {
   countdown: { minutes: 25, seconds: 0 },
   isRunning: false,
 };
+let members = [];
 
 const app = express();
 app.use(cors());
@@ -44,6 +45,18 @@ setInterval(() => {
 
 io.on("connection", (socket) => {
   console.log("A user connected");
+
+  // Listen for username submission
+  socket.on("submit username", (userName) => {
+    // Add user to the list
+    members.push({ socketId: socket.id, name: userName, isCurrentUser: true });
+
+    // Broadcast updated user list to all clients
+    io.emit(
+      "update user list",
+      members.map((user) => ({ socketId: socket.id, name: user.name, isCurrentUser: true }))
+    );
+  });
 
   // Emitting to all clients that a user has connected
   // io.emit("user event", { message: "A user has connected" });
@@ -102,10 +115,19 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
+
+    // Remove user from the list
+    users = members.filter((user) => user.socketId !== socket.id);
+
+    // Broadcast updated user list to all clients
+    io.emit(
+      "update user list",
+      users.map((user) => ({ socketId: socket.id, name: user.name, isCurrentUser: true }))
+    );
   });
 });
 
-const port = process.env.SERVER_PORT
+const port = process.env.SERVER_PORT;
 server.listen(port, "0.0.0.0", () => {
   console.log("Server listening on *:" + port);
 });

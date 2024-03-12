@@ -62,6 +62,15 @@ const ChatApp = () => {
       setMessages((prevMessages) => [...prevMessages, msg]);
     });
 
+    // Listen for updates to the user list from the server
+    socketRef.current.on("update user list", (updatedUserList) => {
+      const updatedMembers = updatedUserList.map((user) => ({
+        name: user.name,
+        isCurrentUser: true,
+      }));
+      setMembers(updatedMembers);
+    });
+
     return () => {
       socketRef.current.disconnect();
     };
@@ -69,7 +78,8 @@ const ChatApp = () => {
 
   const handleUsernameSubmit = () => {
     setIsUsernameDialogOpen(false);
-    setMembers([...members, { name: userName, isCurrentUser: true }]);
+    // Emit the username to the server
+    socketRef.current.emit("submit username", userName);
   };
 
   const sendMessage = (e) => {
