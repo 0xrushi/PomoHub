@@ -40,6 +40,16 @@ setInterval(() => {
   if (timerState.isRunning) {
     decrementTimer();
     io.emit("timer update", timerState);
+    
+    // Broadcast updated user list to all clients
+    io.emit(
+      "update user list",
+      members.map((user) => ({
+        socketId: socket.id,
+        name: user.name,
+        isCurrentUser: true,
+      }))
+    );
   }
 }, 1000);
 

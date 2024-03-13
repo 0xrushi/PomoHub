@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import tinycolor from "tinycolor2";
+import { Tooltip } from "@mui/material";
 
 const MembersDisplay = ({ members, backgroundColor }) => {
   return (
@@ -39,22 +40,24 @@ const MembersDisplay = ({ members, backgroundColor }) => {
                 : null,
             }}
           >
-            <Box
-              sx={{
-                width: "40px",
-                height: "40px",
-                backgroundColor: "white",
-                borderRadius: "50%",
-                color: "black",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-                position: "relative",
-              }}
-            >
-              {member.name}
-            </Box>
+            <Tooltip title={member.name}>
+              <Box
+                sx={{
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  color: "black",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                  position: "relative",
+                }}
+              >
+                {member.name[0]}
+              </Box>
+            </Tooltip>
           </Box>
         ))}
       </Box>

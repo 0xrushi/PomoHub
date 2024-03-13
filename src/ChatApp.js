@@ -160,41 +160,39 @@ const ChatApp = () => {
             lg={matches ? 8 : 0}
             sx={{ backgroundColor: backgroundColor, paddingLeft: "8px" }}
           >
+            <Dialog
+              open={isUsernameDialogOpen}
+              onClose={{}}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogTitle id="form-dialog-title">Enter Username</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  To participate in the chat, please enter your username.
+                </DialogContentText>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Username"
+                  type="text"
+                  fullWidth
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && userName.trim())
+                      handleUsernameSubmit();
+                  }}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleUsernameSubmit} color="primary">
+                  Enter Chat
+                </Button>
+              </DialogActions>
+            </Dialog>
             {matches && (
               <>
-                <Dialog
-                  open={isUsernameDialogOpen}
-                  onClose={{}}
-                  aria-labelledby="form-dialog-title"
-                >
-                  <DialogTitle id="form-dialog-title">
-                    Enter Username
-                  </DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      To participate in the chat, please enter your username.
-                    </DialogContentText>
-                    <TextField
-                      autoFocus
-                      margin="dense"
-                      id="name"
-                      label="Username"
-                      type="text"
-                      fullWidth
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && userName.trim())
-                          handleUsernameSubmit();
-                      }}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleUsernameSubmit} color="primary">
-                      Enter Chat
-                    </Button>
-                  </DialogActions>
-                </Dialog>
                 <List
                   sx={{
                     // maxHeight: "98%",
@@ -238,6 +236,8 @@ const ChatApp = () => {
                   <FormControl
                     fullWidth
                     style={{ display: "flex", flexDirection: "row" }}
+                    component="form" // Add this if you want to treat it like a form
+                    onSubmit={sendMessage} // Ensuring that submit behavior (like pressing Enter) triggers sendMessage
                   >
                     {/* Text field */}
                     <TextField
