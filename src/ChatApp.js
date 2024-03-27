@@ -30,6 +30,74 @@ import MembersDisplay from "./components/memberdisplay/MemberDisplay";
 import SettingsComponent from "./components/settingscomponent/SettingsComponent";
 import tinycolor from "tinycolor2";
 import getFontColorForBackground from "./utils";
+import Picker from "@emoji-mart/react";
+
+import { emojiList } from "./custom_emojis/emojilist";
+import data from "@emoji-mart/data";
+import kek4kImage from "./custom_emojis/kekpack/1128_KEK4K.png";
+
+const renderMessage = (message) => {
+  console.log("received message", message);
+
+  // Improved regex to directly extract custom emoji IDs
+  const regex = /:custom_(\w+):/g;
+
+  // Use an accumulator array to build the message with JSX elements
+  let messageParts = [];
+  let lastIdx = 0; // Track the last index after each match
+
+  message.replace(regex, (match, emojiId, offset) => {
+    // Add text before the emoji (if any) as a plain string
+    if (offset > lastIdx) {
+      messageParts.push(message.slice(lastIdx, offset));
+    }
+
+    // Add the custom emoji image element
+    const emojiSrc = getCustomEmojiSrcById(emojiList, emojiId);
+    if (emojiSrc) {
+      // Ensure emojiSrc is valid
+      messageParts.push(
+        <img
+          key={offset}
+          src={emojiSrc}
+          alt=""
+          style={{ height: "16px", width: "16px", verticalAlign: "middle" }}
+        />,
+      );
+    } else {
+      // If emojiSrc is not found, just return the match (or handle differently)
+      messageParts.push(<p style={{ verticalAlign: "middle" }}>match</p>);
+    }
+
+    // Update lastIdx to the end of the current match
+    lastIdx = offset + match.length;
+  });
+
+  // Add any remaining text after the last emoji (if any)
+  if (lastIdx < message.length) {
+    messageParts.push(
+      <p style={{ verticalAlign: "middle" }}>{message.slice(lastIdx)}</p>,
+    );
+  }
+
+  return <span style={{ display: "flex" }}>{messageParts}</span>;
+};
+
+const getCustomEmojiSrcById = (emojiList, emojiId) => {
+  for (const emojiGroup of emojiList) {
+    for (const emoji of emojiGroup.emojis) {
+      if (
+        emoji.id === emojiId &&
+        emoji.custom === "true" &&
+        emoji.skins &&
+        emoji.skins.length > 0
+      ) {
+        return emoji.skins[0].src; // Return the src of the first skin
+      }
+    }
+  }
+  return null; // Return null if not found
+};
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
@@ -162,7 +230,7 @@ const ChatApp = () => {
           >
             <Dialog
               open={isUsernameDialogOpen}
-              onClose={{}}
+              onClose={() => null}
               aria-labelledby="form-dialog-title"
             >
               <DialogTitle id="form-dialog-title">Enter Username</DialogTitle>
@@ -176,6 +244,7 @@ const ChatApp = () => {
                   id="name"
                   label="Username"
                   type="text"
+                  autoComplete="off"
                   fullWidth
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
@@ -213,7 +282,9 @@ const ChatApp = () => {
                         color: "white",
                       }}
                     >
-                      <ListItemText primary={`${msg.name}: ${msg.message}`} />
+                      {/* <ListItemText primary={`${msg.name}: ${msg.message}`} /> */}
+                      {/* <ListItemText primary={renderMessage(msg.message)} /> */}
+                      <ListItemText>{renderMessage(msg.message)}</ListItemText>
                     </ListItem>
                   ))}
                   <div ref={messagesEndRef} />
@@ -245,6 +316,7 @@ const ChatApp = () => {
                       placeholder="Type a message..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
+                      autoComplete="off"
                       sx={{
                         input: {
                           color: backgroundColor,
@@ -310,7 +382,7 @@ const ChatApp = () => {
                           zIndex: 1000,
                         }}
                       >
-                        <EmojiPicker
+                        {/* <EmojiPicker
                           // prettier-ignore
                           onEmojiClick={(emojiObject) =>
                       setMessage(
@@ -318,6 +390,22 @@ const ChatApp = () => {
                       )
                     }
                           pickerStyle={{ width: "auto" }}
+                        /> */}
+                        <Picker
+                          data={data}
+                          custom={emojiList}
+                          // prettier-ignore
+                          onEmojiSelect={(emojiObject) => {
+                            const a=true;
+                            if (!emojiObject.native) {
+                              console.log(emojiObject)
+                              // For custom emojis, insert a unique identifier or shortcode
+                              setMessage((prevMessage) => `${prevMessage}:custom_${emojiObject.id}:`);
+                            } else {
+                              // For standard emojis, use their native character
+                              setMessage((prevMessage) => `${prevMessage}${emojiObject.native}`);
+                            }
+                          }}
                         />
                       </Box>
                     )}

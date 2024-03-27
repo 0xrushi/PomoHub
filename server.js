@@ -40,16 +40,16 @@ setInterval(() => {
   if (timerState.isRunning) {
     decrementTimer();
     io.emit("timer update", timerState);
-    
-    // Broadcast updated user list to all clients
-    io.emit(
-      "update user list",
-      members.map((user) => ({
-        socketId: socket.id,
-        name: user.name,
-        isCurrentUser: true,
-      }))
-    );
+
+    // // Broadcast updated user list to all clients
+    // io.emit(
+    //   "update user list",
+    //   members.map((user) => ({
+    //     socketId: socket.id,
+    //     name: user.name,
+    //     isCurrentUser: true,
+    //   }))
+    // );
   }
 }, 1000);
 
@@ -58,7 +58,6 @@ io.on("connection", (socket) => {
 
   // Listen for username submission
   socket.on("submit username", (userName) => {
-    // Add user to the list
     members.push({ socketId: socket.id, name: userName, isCurrentUser: true });
 
     // Broadcast updated user list to all clients
@@ -71,9 +70,6 @@ io.on("connection", (socket) => {
       }))
     );
   });
-
-  // Emitting to all clients that a user has connected
-  // io.emit("user event", { message: "A user has connected" });
 
   // Send the current timer state to newly connected clients
   socket.emit("timer update", timerState);

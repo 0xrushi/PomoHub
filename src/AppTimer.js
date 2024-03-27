@@ -5,7 +5,6 @@ import TimerButton from "./components/timer/TimerButton";
 import TimerSelector from "./components/timer/TimerSelector";
 import Tasks from "./components/tasks/Tasks";
 import Footer from "./components/Footer";
-import { io } from "socket.io-client";
 
 function AppTimer({ backgroundColor, toggleGridState, newSocket }) {
   const [countdown, setCountdown] = useState({
@@ -67,9 +66,43 @@ function AppTimer({ backgroundColor, toggleGridState, newSocket }) {
     newSocket.emit("reset timer", { countdown: resetState, isRunning: false });
   }
 
+  const showNotification = () => {
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      new Notification("Timer Finished", {
+        body: "Your countdown has ended!",
+      });
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then((permission) => {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          new Notification("Timer Finished", {
+            body: "Your countdown has ended!",
+          });
+        }
+      });
+    }
+  };
+
+  // Function to play sound
+  const playSound = () => {
+    const audio = new Audio("audios/happy_bells.wav");
+    audio
+      .play()
+      .catch((error) => console.log("Error playing the sound:", error));
+  };
+
   useEffect(() => {
     document.body.style.backgroundColor = backgroundColor;
-  }, [backgroundColor]);
+
+    if (countdown.seconds <= 0 && countdown.minutes <= 0 && isRunning) {
+      showNotification();
+      playSound();
+      handleReset();
+    }
+  }, [backgroundColor, countdown]);
 
   return (
     <Box style={{ position: "fixed" }}>
