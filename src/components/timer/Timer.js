@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import getFontColorForBackground from "../../utils";
+import { getFontColorForBackground } from "../../utils";
 
 const Timer = ({ socket, setCountdown, countdown, backgroundColor }) => {
   const [editable, setEditable] = useState(false);

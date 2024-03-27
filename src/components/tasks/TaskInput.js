@@ -1,4 +1,4 @@
-import getFontColorForBackground from "../../utils";
+import { getFontColorForBackground } from "../../utils";
 
 export default function TaskInput({ handleAddTask, backgroundColor }) {
   return (

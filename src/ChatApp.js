@@ -29,7 +29,7 @@ import { useMediaQuery } from "@mui/material";
 import MembersDisplay from "./components/memberdisplay/MemberDisplay";
 import SettingsComponent from "./components/settingscomponent/SettingsComponent";
 import tinycolor from "tinycolor2";
-import getFontColorForBackground from "./utils";
+import { getFontColorForBackground, formatDate, formatTime } from "./utils";
 import Picker from "@emoji-mart/react";
 
 import { emojiList } from "./custom_emojis/emojilist";
@@ -117,6 +117,8 @@ const ChatApp = () => {
   const socketRef = useRef();
 
   const [members, setMembers] = useState([]);
+  const [fromDate, setFromDate] = useState([]);
+  const [fromTime, setFromTime] = useState([]);
 
   useEffect(() => {
     document.body.style.backgroundColor = backgroundColor;
@@ -139,6 +141,10 @@ const ChatApp = () => {
       }));
       setMembers(updatedMembers);
     });
+
+    const now = new Date();
+    setFromDate(formatDate(now));
+    setFromTime(formatTime(now));
 
     return () => {
       socketRef.current.disconnect();
@@ -284,7 +290,14 @@ const ChatApp = () => {
                     >
                       {/* <ListItemText primary={`${msg.name}: ${msg.message}`} /> */}
                       {/* <ListItemText primary={renderMessage(msg.message)} /> */}
-                      <ListItemText>{renderMessage(msg.message)}</ListItemText>
+                      {/* <ListItemText>{`${fromDate}-${fromTime} ${msg.name}:  ${renderMessage(msg.message)}`}</ListItemText> */}
+                      <ListItemText>
+                        <span style={{ display: "flex" }}>
+                          {`${fromDate}-${fromTime} ${msg.name}:  `}{" "}
+                          &nbsp;&nbsp;
+                          {renderMessage(msg.message)}
+                        </span>
+                      </ListItemText>
                     </ListItem>
                   ))}
                   <div ref={messagesEndRef} />

@@ -29,7 +29,7 @@ module.exports = {
     'prettier', // Runs Prettier as an ESLint rule and reports differences as individual ESLint issues
   ],
   rules: {
-    "comma-dangle": ["error", "never"],
+    "comma-dangle": "off",
     'prettier/prettier': 'error', // Indicates any deviations from Prettier's default settings as errors
     'react/react-in-jsx-scope': 'off', // React 17+ doesn't require React to be in scope when using JSX
     'react/prop-types': 'off', // Disables prop-types rule, as TypeScript is used for type checking
