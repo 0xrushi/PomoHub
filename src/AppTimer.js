@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import Timer from "./components/timer/Timer.js";
 import TimerButton from "./components/timer/TimerButton";
