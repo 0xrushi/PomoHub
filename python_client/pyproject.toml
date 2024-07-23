@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pomodoro-tui"
+version = "0.1.0"
+description = "A Pomodoro TUI app using Textualize"
+authors = ["0xrushi"]
+packages = [{include = "pomodoro_tui", from = "src"}]
+include = [
+    "src/pomodoro_tui/config.ini",
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+textual = "^0.73.0"
+python-socketio = "^5.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+pomohub = "pomodoro_tui.app:main"

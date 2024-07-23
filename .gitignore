@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 node_modules
+python_client/src/pomodro_tui/__pycache__/app.cpython-312.pyc
+python_client/src/pomodro_tui/__pycache__/__init__.cpython-312.pyc
