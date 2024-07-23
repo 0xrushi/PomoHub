@@ -2,6 +2,8 @@ import time
 import asyncio
 import configparser
 import logging
+import platform
+from playsound import playsound
 from textual.app import App, ComposeResult
 from textual.widgets import Button, Label, Input, Static
 from textual.containers import Container, Horizontal
@@ -106,6 +108,10 @@ class PomodoroApp(App):
         config_file_path = os.path.join(os.path.dirname(__file__), 'config.ini')
         config.read(config_file_path)
         return config
+    
+    def play_audio(self):
+        sound_file = os.path.join(os.path.dirname(__file__), 'audio/happy_bells.wav')
+        playsound(sound_file)
 
 
     username_submitted = reactive(False)
@@ -174,7 +180,8 @@ class PomodoroApp(App):
             self.countdown['seconds'] = 59
         else:
             self.is_running = False
-            self.logger.info("Timer finished")
+            self.logger.debug("Timer finished")
+            self.play_audio()
         self.update_timer_display()
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:

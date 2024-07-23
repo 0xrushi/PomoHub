@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pomodoro-tui"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Pomodoro TUI app using Textualize"
 authors = ["0xrushi"]
 packages = [{include = "pomodoro_tui", from = "src"}]
@@ -11,6 +11,7 @@ include = [
 [tool.poetry.dependencies]
 python = "^3.12"
 textual = "^0.73.0"
+playsound = "^1.2.2"
 python-socketio = "^5.8.0"
 
 [build-system]
