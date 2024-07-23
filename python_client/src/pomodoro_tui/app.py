@@ -14,7 +14,7 @@ from rich.panel import Panel
 from rich.text import Text
 
 from textual.widgets import Static
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 class MemberList(Static):
     def __init__(self):
