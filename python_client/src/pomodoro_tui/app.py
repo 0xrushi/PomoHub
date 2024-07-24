@@ -14,6 +14,8 @@ from rich.columns import Columns
 from importlib import resources
 from rich.panel import Panel
 from rich.text import Text
+from textual.binding import Binding
+
 
 from textual.widgets import Static
 logging.basicConfig(level=logging.INFO)
@@ -44,9 +46,20 @@ class MemberList(Static):
         return Columns(member_panels, expand=False, equal=True, align="center")
 
 class PomodoroApp(App):
+    BINDINGS = [
+        Binding("up", "move_up", "Move Up"),
+        Binding("down", "move_down", "Move Down"),
+        Binding("enter", "activate", "Activate Button"),
+    ]
+
+    current_button_index = reactive(0)
+
     CSS = """
     Screen {
         align: center middle;
+        layout: grid;
+        grid-size: 1;
+        grid-gutter: 0;
     }
 
     #timer {
@@ -68,8 +81,8 @@ class PomodoroApp(App):
     }
 
      #main {
-        width: 60;
-        height: auto;
+        width: 100%;
+        height: 100%;
         border: solid green;
         padding: 1 2;
     }
@@ -102,6 +115,7 @@ class PomodoroApp(App):
         self.member_list = MemberList()
         self.config = self.read_config()
         self.server_url = self.config.get('SERVER_API_URL', 'url')
+        self.buttons = []  
     
     def read_config(self):
         config = configparser.ConfigParser()
@@ -125,11 +139,36 @@ class PomodoroApp(App):
             Button("Submit Username", id="submit_username", disabled=False),
             Button("Start", id="start_stop", disabled=True),
             Button("Reset", id="reset", disabled=True),
+            Button("Exit", id="exit", disabled=False),
             Label("Status", id="status"),
             Label("Members:", id="members_label"),
             Horizontal(self.member_list, id="member_container"),
             id="main"
         )
+    
+    def update_button_focus(self) -> None:
+        buttons = self.query(Button)
+        for index, button in enumerate(buttons):
+            if index == self.current_button_index:
+                button.focus()
+            else:
+                button.blur()
+
+    def action_move_up(self) -> None:
+        buttons = list(self.query(Button))
+        self.current_button_index = (self.current_button_index - 1) % len(buttons)
+        self.update_button_focus()
+
+    def action_move_down(self) -> None:
+        buttons = list(self.query(Button))
+        self.current_button_index = (self.current_button_index + 1) % len(buttons)
+        self.update_button_focus()
+
+    def action_activate(self) -> None:
+        buttons = list(self.query(Button))
+        if 0 <= self.current_button_index < len(buttons):
+            button = buttons[self.current_button_index]
+            self.on_button_pressed(Button.Pressed(button))
 
     def setup_socket_events(self):
         @self.sio.event
@@ -215,7 +254,7 @@ class PomodoroApp(App):
                         },
                         "isRunning": True
                     })
-                    self.query_one("#start_stop").label = "Stop Timer"
+                    self.query_one("#start_stop").label = "Pause Timer"
                     self.notify("Timer started")
                 except ValueError:
                     self.notify("Please enter a valid number of minutes", severity="error")
@@ -238,9 +277,12 @@ class PomodoroApp(App):
             self.query_one("#start_stop").label = "Start"
             self.query_one("#time_input").value = ""
             self.notify("Timer reset")
+        elif button_id == "exit":
+            exit(0)
 
 
     def on_mount(self) -> None:
+        self.buttons = list(self.query(Button))  
         self.update_timer_display()
         self.set_interval(1, self.update_timer)
         asyncio.create_task(self.connect_to_server())
@@ -263,6 +305,7 @@ class PomodoroApp(App):
         submit_username_button.disabled = self.username_submitted
         username_input_input.disabled = self.username_submitted
         
+        self.update_button_focus()
 
     def update_timer(self):
         if self.is_running:
