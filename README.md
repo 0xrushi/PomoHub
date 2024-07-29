@@ -46,6 +46,9 @@ To start using PomoHub, follow these steps:
 
    Visit `http://localhost:3001` on your browser to start using PomoHub.
 
+   ![image](https://github.com/user-attachments/assets/6f7b12f4-d69a-41ea-a357-3a0fb38c0cf4)
+
+
 ## Pomohub now has TUI 
 
 ![](https://media1.tenor.com/m/gDfUt8Kry48AAAAC/yay-minions.gif)
