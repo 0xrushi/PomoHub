@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:async';
 import 'package:flutter/services.dart';
-// import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(MyApp());
@@ -86,7 +85,6 @@ class _PomodoroTimerState extends State<PomodoroTimer>
   bool isChatMode = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
-  // final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -101,12 +99,7 @@ class _PomodoroTimerState extends State<PomodoroTimer>
     );
     timerController.text = '25:00';
     connectToServer();
-    // loadRingtone();
   }
-
-  // Future<void> loadRingtone() async {
-  //   await audioPlayer.setSource(AssetSource('happy_bells.wav'));
-  // }
 
   void connectToServer() {
     socket = IO.io('https://api.pomohub.xyz', <String, dynamic>{
@@ -118,6 +111,8 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
     socket!.on('connect', (_) {
       print('Connected to server');
+      // Request chat history when connected
+      socket!.emit('get chat history');
     });
 
     socket!.on('timer update', (data) {
@@ -130,13 +125,20 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       });
 
       if (minutes == 0 && seconds == 0) {
-        // playRingtone();
+        // Timer finished logic here
       }
     });
 
     socket!.on('update user list', (users) {
       setState(() {
         connectedUsers = List<String>.from(users.map((user) => user['name']));
+      });
+    });
+
+    socket!.on('chat history', (history) {
+      setState(() {
+        chatMessages = List<String>.from(
+            history.map((msg) => '${msg['name']}: ${msg['message']}'));
       });
     });
 
@@ -148,10 +150,6 @@ class _PomodoroTimerState extends State<PomodoroTimer>
       }
     });
   }
-
-  // void playRingtone() async {
-  //   await audioPlayer.play(AssetSource('happy_bells.wav'));
-  // }
 
   void startTimer() {
     final parts = timerController.text.split(':');
@@ -170,7 +168,6 @@ class _PomodoroTimerState extends State<PomodoroTimer>
 
   void resetTimer() {
     socket!.emit('reset timer');
-    // audioPlayer.stop();
     setState(() {
       timerController.text = '25:00';
     });
@@ -429,7 +426,6 @@ class _PomodoroTimerState extends State<PomodoroTimer>
   void dispose() {
     socket?.disconnect();
     _animationController.dispose();
-    // audioPlayer.dispose();
     timerController.dispose();
     super.dispose();
   }
